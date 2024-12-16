@@ -28,30 +28,40 @@ public class Locus
   public double eval(String func, double x)
   {
     // First pass through func:
-    // Insert variables and account for implied multiplication by the variable
-    // Account for negative signs
-    for (int i = 0; i < func.length(); i++)
+    // Replace occurrences of x with implied multiplication
+    // Replace negative signs with implied multiplication
+    int i = 0;
+    while (i < func.length())
     {
       String token = func.substring(i,i+1);
+      System.out.println("i: " + i + ", token: " + token);
       if (token.equals("x"))
       {
         String after = func.substring(i+1);
         func = func.substring(0,i);
         func += "(" + x + ")";
         func += after;
+        i += 1;
       }
-      if (isBeforeNeg(func,i-1))
+      else if (isBeforeNegativeSign(func,i-1))
       {
+        System.out.println("before neg: " + func);
         String after = func.substring(i+1);
         func = func.substring(0,i);
-        func += "(0-1)";
+        func += "(0-1)*";
         func += after;
+        System.out.println("after neg: " + func);
+        i += 5;
       }
+      else
+        i += 1;
    }
+   System.out.println("After first pass: " + func);
+
    // Second pass through func:
    // Find all instances of implied multiplication
    // and insert * signs where necessary
-   for (int i = 0; i < func.length(); i++)
+   for (i = 0; i < func.length(); i++)
    {
       String token = func.substring(i,i+1);
       // If there is implied multiplication
@@ -76,7 +86,8 @@ public class Locus
   }
 
   // Returns true if the ith character of f is before a negative sign
-  public boolean isBeforeNeg(String f, int i)
+  // Precondition: |f| >= i + 2
+  public boolean isBeforeNegativeSign(String f, int i)
   {
      //If the next character is not a minus
      if (!f.substring(i+1,i+2).equals("-")) return false;
@@ -89,7 +100,7 @@ public class Locus
   //Precondition: i is a legal index of f
   public boolean mightPrecedeOp(String f, int i)
   {
-      //All possible characters before an operator
+      //All possible (non-operator) characters preceding an operator
       String beforeOp = ")1234567890";
       return beforeOp.indexOf(f.substring(i,i+1)) > -1;
   }
@@ -98,5 +109,12 @@ public class Locus
   {
       String operators = "+-/*";
       return operators.indexOf(s) > -1;
+  }
+  
+  // Main method for testing only
+  public static void main(String[] args) {
+      Locus loc = new Locus(0,0);
+      double test = loc.eval("--x", 5);
+      System.out.println(test);
   }
 }

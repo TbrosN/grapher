@@ -2,9 +2,9 @@ import java.util.*;
 public class EvalInfix2
 {
     /*
-    For example, if the user enters (a+b)/(c-b) your code should:
-    convert it to postfix ab+cb-/  (I suggest you print this for debugging purposes)
-    perform ONE pass through the postfix expression:
+    For example, if the user enters (a+b)/(c-b), convert it to postfix ab+cb-/
+
+    Perform ONE pass through the postfix expression:
     if the character is an operand, you will check to see if you have already encountered this operand.
     if you have not, you will prompt the user to enter a value for the operand.
     you will instantiate an object of your variable class, and store the character with its value

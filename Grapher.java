@@ -5,7 +5,7 @@ import javax.swing.event.*;
 
 import java.util.ArrayList;
 
-class Grapher extends JFrame implements ActionListener
+public class Grapher extends JFrame implements ActionListener
 {
     private GraphView view;
     private GraphModel model;
@@ -15,7 +15,7 @@ class Grapher extends JFrame implements ActionListener
     private JTextField equation;
     private JButton clearButton;
     
-    Grapher()
+    public Grapher()
     {
       super("Grapher");
       view = new GraphView();

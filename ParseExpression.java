@@ -40,8 +40,9 @@ public class ParseExpression
 					result.add(token);
 					theNumber = "";
 				}
-			else
-				theNumber += token;	
+			else if (isNumber(token)) {
+				theNumber += token;
+			}
 		}
 		if ( !theNumber.equals("") ) 
 			result.add(theNumber);
