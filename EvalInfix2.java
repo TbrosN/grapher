@@ -1,17 +1,16 @@
+/**
+ * This class provides a method to evaluate mathematical expressions represented in postfix notation.
+ */
 import java.util.*;
 public class EvalInfix2
 {
-    /*
-    For example, if the user enters (a+b)/(c-b), convert it to postfix ab+cb-/
-
-    Perform ONE pass through the postfix expression:
-    if the character is an operand, you will check to see if you have already encountered this operand.
-    if you have not, you will prompt the user to enter a value for the operand.
-    you will instantiate an object of your variable class, and store the character with its value
-    you will push the value of the variable onto the stack
-    if the character is an operator, you will pop, pop, and apply the operator. Push the result onto the stack.
-    when you reach the end of the postfix string the value of the expression will be the only item on your stack.
-    */
+    /**
+     * Evaluates a mathematical expression given in postfix notation.
+     *
+     * @param postfix A list of tokens representing a postfix expression. Each element is either a numeric operand
+     *                (e.g., "2.0") or an operator (e.g., "+", "-", "*", "/").
+     * @return The evaluated result as a double.
+     */
     public static double result(List<String> postfix)
     {
         String operators = "+-*/";
@@ -32,8 +31,13 @@ public class EvalInfix2
                   nums.push(a-b);
                else if (theChar.equals("*"))
                    nums.push(a*b);
-               else if (theChar.equals("/"))
-                   nums.push(a/b);
+               else if (theChar.equals("/")) {
+                    if (b == 0) {
+                        System.out.println("Division by zero occurred!");
+                        return 0;
+                    }
+                    nums.push(a/b);
+               }
             }
 
         }

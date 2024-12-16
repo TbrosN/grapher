@@ -2,119 +2,148 @@ import java.awt.*;
 import java.util.*;
 import java.awt.geom.*;
 
+/**
+ * The Locus class represents a mathematical locus of points, typically used for plotting graphs
+ * of functions. It manages points calculated from a function string and allows dynamic updates.
+ */
 public class Locus
 {
-  private ArrayList<Point2D.Double> points;
-  private Point origin;
+    private ArrayList<Point2D.Double> points; // List of points representing the locus
+    private Point origin; // The origin point of the graph
 
-  public Locus(int w, int h)
-  {
-    points = new ArrayList<Point2D.Double>();
-    origin = new Point(w/2,h/2);
-  }
-
-  public ArrayList<Point2D.Double> getPoints()
-  {
-    return points;
-  }
-
-  public void updatePoints(String func, double start, double end)
-  {
-    if (func.length()<1) return;
-    for (double i = start; i <= end; i++)
-        points.add( new Point2D.Double(origin.x+i, origin.y-eval(func, i)) );
-  }
-
-  public double eval(String func, double x)
-  {
-    // First pass through func:
-    // Replace occurrences of x with implied multiplication
-    // Replace negative signs with implied multiplication
-    int i = 0;
-    while (i < func.length())
+    /**
+     * Constructs a Locus object with a specified width and height.
+     * The origin is initialized at the center of the given dimensions.
+     *
+     * @param w The width of the graphing area.
+     * @param h The height of the graphing area.
+     */
+    public Locus(int w, int h)
     {
-      String token = func.substring(i,i+1);
-      System.out.println("i: " + i + ", token: " + token);
-      if (token.equals("x"))
-      {
-        String after = func.substring(i+1);
-        func = func.substring(0,i);
-        func += "(" + x + ")";
-        func += after;
-        i += 1;
-      }
-      else if (isBeforeNegativeSign(func,i-1))
-      {
-        System.out.println("before neg: " + func);
-        String after = func.substring(i+1);
-        func = func.substring(0,i);
-        func += "(0-1)*";
-        func += after;
-        System.out.println("after neg: " + func);
-        i += 5;
-      }
-      else
-        i += 1;
-   }
-   System.out.println("After first pass: " + func);
-
-   // Second pass through func:
-   // Find all instances of implied multiplication
-   // and insert * signs where necessary
-   for (i = 0; i < func.length(); i++)
-   {
-      String token = func.substring(i,i+1);
-      // If there is implied multiplication
-      if (i-1 >= 0 && mightPrecedeOp(func,i-1))
-         if (token.equals("(") ||
-             !isOperator(token) &&
-             func.substring(i-1,i).equals(")") &&
-             !token.equals(")"))
-         {
-            String after = func.substring(i);
-            func = func.substring(0,i);
-            func += "*";
-            func += after;
-         }
+        points = new ArrayList<Point2D.Double>();
+        origin = new Point(w/2, h/2);
     }
-    //System.out.println("Infix: " + func);
-    return EvalInfix2.result(
-               Postfix2.convert(
-                  ParseExpression.parser(func)
-               )
-           );
-  }
 
-  // Returns true if the ith character of f is before a negative sign
-  // Precondition: |f| >= i + 2
-  public boolean isBeforeNegativeSign(String f, int i)
-  {
-     //If the next character is not a minus
-     if (!f.substring(i+1,i+2).equals("-")) return false;
-     //If the negative sign is the 0th character of f
-     if (i < 0) return true;
-     return !mightPrecedeOp(f,i);
-  }
-  
-  //Returns true if the ith character of f COULD precede an operator
-  //Precondition: i is a legal index of f
-  public boolean mightPrecedeOp(String f, int i)
-  {
-      //All possible (non-operator) characters preceding an operator
-      String beforeOp = ")1234567890";
-      return beforeOp.indexOf(f.substring(i,i+1)) > -1;
-  }
-  
-  public boolean isOperator(String s)
-  {
-      String operators = "+-/*";
-      return operators.indexOf(s) > -1;
-  }
-  
-  // Main method for testing only
-  public static void main(String[] args) {
-      Locus loc = new Locus(0,0);
-      double test = loc.eval("--x", 5);
-      System.out.println(test);
-  }
+    /**
+     * Returns the list of points representing the locus.
+     *
+     * @return An ArrayList of Point2D.Double objects.
+     */
+    public ArrayList<Point2D.Double> getPoints()
+    {
+        return points;
+    }
+
+    /**
+     * Updates the locus points based on the given function string and range of x values.
+     *
+     * @param func The function string to evaluate.
+     * @param start The starting x-coordinate.
+     * @param end The ending x-coordinate.
+     */
+    public void updatePoints(String func, double start, double end)
+    {
+        if (func.length() < 1) return;
+        for (double i = start; i <= end; i++)
+        {
+            points.add(new Point2D.Double(origin.x + i, origin.y - eval(func, i)));
+        }
+    }
+
+    /**
+     * Evaluates the given function string at a specific x value.
+     *
+     * @param func The function string to evaluate.
+     * @param x The value of x to substitute into the function.
+     * @return The result of the function evaluation as a double.
+     */
+    public double eval(String func, double x)
+    {
+        int i = 0;
+        while (i < func.length())
+        {
+            String token = func.substring(i, i + 1);
+            if (token.equals("x"))
+            {
+                String after = func.substring(i + 1);
+                func = func.substring(0, i);
+                func += "(" + x + ")";
+                func += after;
+                i += 1;
+            }
+            else if (isBeforeNegativeSign(func, i - 1))
+            {
+                String after = func.substring(i + 1);
+                func = func.substring(0, i);
+                func += "(0-1)*";
+                func += after;
+                i += 5;
+            }
+            else
+                i += 1;
+        }
+
+        for (i = 0; i < func.length(); i++)
+        {
+            String token = func.substring(i, i + 1);
+            if (i - 1 >= 0 && mightPrecedeOp(func, i - 1))
+            {
+                if (token.equals("(") ||
+                    !isOperator(token) &&
+                    func.substring(i - 1, i).equals(")") &&
+                    !token.equals(")"))
+                {
+                    String after = func.substring(i);
+                    func = func.substring(0, i);
+                    func += "*";
+                    func += after;
+                }
+            }
+        }
+
+        return EvalInfix2.result(
+                Postfix2.convert(
+                        ParseExpression.parser(func)
+                )
+        );
+    }
+
+    /**
+     * Determines if the ith character in the function string is before a negative sign.
+     *
+     * @param f The function string.
+     * @param i The index to check.
+     * @return True if the character is before a negative sign, otherwise false.
+     */
+    public boolean isBeforeNegativeSign(String f, int i)
+    {
+        if (!f.substring(i + 1, i + 2).equals("-")) return false;
+        if (i < 0) return true;
+        return !mightPrecedeOp(f, i);
+    }
+
+    /**
+     * Determines if the ith character in the function string could precede an operator.
+     *
+     * @param f The function string.
+     * @param i The index to check.
+     * @return True if the character could precede an operator, otherwise false.
+     */
+    public boolean mightPrecedeOp(String f, int i)
+    {
+        String beforeOp = ")1234567890";
+        return beforeOp.indexOf(f.substring(i, i + 1)) > -1;
+    }
+
+    /**
+     * Determines if the given string is an operator.
+     *
+     * @param s The string to check.
+     * @return True if the string is an operator, otherwise false.
+     */
+    public boolean isOperator(String s)
+    {
+        String operators = "+-/*";
+        return operators.indexOf(s) > -1;
+    }
 }
